@@ -134,9 +134,3 @@ Built by **Ritesh** & **Himanshu** with ❤️ using Flask + Gemini.
 
 ## 📄 License
 MIT. Use freely; attribution appreciated.
-
-## 📬 Optional Links
-Add your LinkedIn / Portfolio / Twitter here.
-
----
-> Tip: On a résumé: “Built a streaming multi‑persona AI chat (Gemini 1.5 Flash) with SSE, role prompt system, and persistence architecture.”
