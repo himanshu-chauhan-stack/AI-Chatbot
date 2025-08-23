@@ -1,5 +1,13 @@
 title: AI Chat Assistant
-description: Real-time multi-persona Gemini chat app
+description: Real-time multi-persona Gemini chat app (Gemini 1.5 Flash)
 theme: minima
 logo: /preview-light.png
 show_downloads: false
+github:
+	is_project_page: true
+	is_user_page: false
+include:
+	- assets
+sass:
+	style: compressed
+author: Ritesh & Himanshu
