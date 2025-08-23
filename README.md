@@ -6,19 +6,6 @@ An elegant, fast, multi‑persona AI chat experience powered by **Google Gemini 
 
 ![Status](https://img.shields.io/badge/Status-Active-success?style=flat-square) ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white&style=flat-square) ![Flask](https://img.shields.io/badge/Flask-Backend-black?logo=flask&style=flat-square) ![Gemini](https://img.shields.io/badge/Model-gemini--1.5--flash-orange?style=flat-square) ![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)
 
-<table>
-<tr>
-<td align="center"><picture>
-   <source srcset="assets/screenshots/placeholder_main_light.png" type="image/svg+xml"/>
-   <img src="assets/screenshots/placeholder_main_light.png" alt="Main UI Light" width="320"/>
-</picture><br/><sub>Main Interface (Light)</sub></td>
-<td align="center"><img src="assets/screenshots/placeholder_chat_light.png" alt="Chat View Light" width="320"><br/><sub>Active Chat (Light)</sub></td>
-</tr>
-</table>
-<sub><em>Add your real screenshots in <code>assets/screenshots</code> (keep same filenames).</em></sub>
-
-</div>
-
 ---
 
 ## 📸 Screenshots
