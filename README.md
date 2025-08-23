@@ -8,6 +8,19 @@ An elegant, fast, multi‑persona AI chat experience powered by **Google Gemini 
 
 ---
 
+## 🌐 Live Demo (GitHub Pages)
+Experience the UI instantly:
+
+| Type | Link |
+|------|------|
+| Landing Page | https://himanshu-chauhan-stack.github.io/AI-Chatbot/ |
+| Direct Chat Demo | https://himanshu-chauhan-stack.github.io/AI-Chatbot/chat.html |
+
+Notes:
+- The chat demo supports a client-side (optional) API key field. For security, prefer running locally with server-side key.
+- If links 404, ensure GitHub Pages is enabled: Repo → Settings → Pages → Source: `main` / `docs`.
+
+
 ## 📸 Screenshots
 | Main Interface (Light) | Active Chat (Light) |
 |------------------------|---------------------|
