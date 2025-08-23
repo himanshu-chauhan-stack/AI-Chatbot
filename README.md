@@ -9,7 +9,7 @@ An elegant, fast, multi‑persona AI chat experience powered by **Google Gemini 
 <table>
 <tr>
 <td align="center"><picture>
-   <source srcset="assets/screenshots/placeholder_main_light.svg" type="image/svg+xml"/>
+   <source srcset="assets/screenshots/placeholder_main_light.png" type="image/svg+xml"/>
    <img src="assets/screenshots/placeholder_main_light.png" alt="Main UI Light" width="320"/>
 </picture><br/><sub>Main Interface (Light)</sub></td>
 <td align="center"><img src="assets/screenshots/placeholder_chat_light.png" alt="Chat View Light" width="320"><br/><sub>Active Chat (Light)</sub></td>
