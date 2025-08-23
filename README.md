@@ -2,136 +2,145 @@
 
 # 🤖 AI Chat Assistant
 
-Multi‑persona, real‑time AI chat app powered by **Google Gemini (gemini‑1.5‑flash)**, built with **Flask** + **Vanilla JS**. Clean UI, fast streaming answers, local persistence, role switching, dark mode – production‑ready and résumé‑showcase friendly.
+An elegant, fast, multi‑persona AI chat experience powered by **Google Gemini (gemini‑1.5‑flash)**. Built with **Flask + Vanilla JavaScript**. Streaming responses, smart role prompts, dark/light theming, and a clean developer‑friendly architecture.
 
 ![Status](https://img.shields.io/badge/Status-Active-success?style=flat-square) ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white&style=flat-square) ![Flask](https://img.shields.io/badge/Flask-Backend-black?logo=flask&style=flat-square) ![Gemini](https://img.shields.io/badge/Model-gemini--1.5--flash-orange?style=flat-square) ![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)
 
-<img src="docs/preview-light.png" alt="Light Mode Screenshot" width="640"/><br/>
-<sub><em>Dark & Light themes • Streaming responses • Role selector</em></sub>
+<table>
+<tr>
+<td align="center"><img src="assets/screenshots/placeholder_main_light.png" alt="Main UI Light" width="320"><br/><sub>Main Interface (Light)</sub></td>
+<td align="center"><img src="assets/screenshots/placeholder_chat_light.png" alt="Chat View Light" width="320"><br/><sub>Active Chat (Light)</sub></td>
+</tr>
+</table>
+<sub><em>Add your real screenshots in <code>assets/screenshots</code> (keep same filenames).</em></sub>
 
 </div>
 
 ---
 
-## 💼 Résumé Pitch (copy/paste)
-Designed and implemented a production‑ready multi‑persona AI chat platform using Flask + Google Gemini (1.5‑flash) with live streaming (SSE), local persistence, semantic role prompts, theming, and extensible architecture. Added intent overrides (model + authors), performance‑aware history trimming, and structured logging.
+## � Why This Project Exists
+I wanted a minimal, fast, open implementation of a modern AI chat—without React bloat, with real streaming, and with clean persona prompts you can actually extend. This is a foundation you can fork into your own product, portfolio piece, or internal tool.
 
-## ✨ Feature Highlights
-| Category | Capabilities |
-|----------|--------------|
-| Core Chat | Real‑time SSE streaming, markdown formatting, code blocks |
-| AI Personalities | Helpful Assistant, Teacher, Financial Advisor, Creative Writer, Technical Expert (easily extendable) |
-| UX | Typing indicator, auto‑grow input, role switching, dark/light theme, animated credits footer |
-| Persistence | Session + localStorage hybrid (safe vs cookie size limits) |
-| Reliability | Graceful error handling, health endpoint, debug & test routes, history trimming |
-| Custom Intents | Built‑in answers for “Which model...?” / “Who developed you?” |
+## 💼 Résumé Snippet
+Implemented a production‑grade multi‑persona AI chat platform (Flask + Gemini 1.5 Flash) featuring SSE token streaming, role‑based system prompts, dark/light theming, local persistence, intent shortcuts, and robust session/history management.
 
-## 🧠 Architecture Overview
+## ✨ Features
+| Area | Highlights |
+|------|-----------|
+| Streaming | Server‑Sent Events (token-by-token) with graceful fallback |
+| Personas | 5 curated roles (easily extendable) with system prompts |
+| UX Polish | Auto‑resizing input, role switcher, theme toggle, typing cadence |
+| Persistence | Hybrid session + localStorage (no cookie overflow) |
+| Safeguards | Intent overrides for common meta queries (model / creators) |
+| Extensibility | Centralized role config + clean prompt build path |
+
+## 🧠 Architecture Snapshot
 ```
-Browser
-   ├── chat.js (UI logic, streaming parser, localStorage cache)
-   └── style.css (theme tokens + responsive layout)
-Flask App (app.py)
-   ├── /chat (JSON)            ← fallback
-   ├── /chat/stream (SSE)      ← primary real-time path
-   ├── /get_history /clear_chat
-   ├── /health /debug_session
-   └── Role prompt builder → Gemini (gemini-1.5-flash)
+Frontend (static)
+   ├─ chat.js        # UI logic + SSE stream parsing
+   ├─ style.css      # Theme tokens & layout
+   └─ index.html     # Template w/ role selector
+Backend (Flask)
+   ├─ app.py         # Routes: /chat, /chat/stream, intents
+   ├─ config.py      # Roles, API key, limits
+   └─ (Gemini SDK)   # google-generativeai
 ```
 
-## 🚀 Quick Start
+## 🚀 Get Running (5 Steps)
 ```bash
-git clone <your-repo-url>
-cd ai-chat-assistant
+git clone https://github.com/himanshu-chauhan-stack/AI-Chatbot.git
+cd AI-Chatbot
 pip install -r requirements.txt
-python app.py  # visit http://localhost:5000
+# set your key (option A)
+setx GEMINI_API_KEY "YOUR_KEY_HERE"  # Windows (new shell after)
+# or put it in config.py (option B)
+python app.py
 ```
-Set your API key in `config.py` (or export `GEMINI_API_KEY`).
+Visit: http://localhost:5000
 
-## 🔧 Configuration Cheat Sheet
-| Setting | File | Purpose |
-|---------|------|---------|
-| GEMINI_API_KEY | `config.py` | Model auth |
-| AI_ROLES | `config.py` | Persona system prompts |
-| MAX_CHAT_HISTORY | `config.py` | Memory window limit |
-| Streaming Endpoint | `/chat/stream` | SSE token flow |
+## ⚙️ Config At A Glance
+| Key | Where | Notes |
+|-----|-------|-------|
+| GEMINI_API_KEY | env or config.py | Auth token |
+| AI_ROLES | config.py | Persona definitions |
+| MAX_CHAT_HISTORY | config.py | Rolling memory window |
+| /chat/stream | app.py | Primary SSE endpoint |
 
 ## 🛠 Tech Stack
 | Layer | Tools |
-|-------|-------|
+|-------|------|
 | Backend | Flask, google-generativeai |
 | Frontend | Vanilla JS, Fetch API, SSE |
-| Styling | CSS custom properties, responsive layout |
-| AI Model | Google Gemini 1.5 Flash |
+| Styling | Modern CSS (flex/grid, variables) |
+| AI | Gemini 1.5 Flash |
 
-## 🏎 Performance & Design Notes
-* Streaming via SSE avoids blocking and enables token‑level UX.
-* LocalStorage prevents cookie bloat (browser session size limits) while still restoring state after refresh.
-* History trimming ensures prompt size stays within efficient limits.
-* Intent short‑circuits for common meta questions reduce API calls.
+## 🏎 Design Decisions
+* SSE chosen over WebSockets for simplicity + native streaming.
+* Role prompts centralized for maintainability.
+* Intent shortcuts avoid pointless paid tokens.
+* History trimming prevents runaway context size.
 
-## 🧪 Optional Test Prompts
-| Purpose | Prompt |
-|---------|--------|
-| Model check | Which model are you using? |
-| Credits | Who developed you? |
-| Persona switch | Act as a teacher and explain gravity. |
-| Streaming | Give me 5 creative startup ideas, elaborate each. |
+## 🧪 Handy Prompts To Try
+| Goal | Prompt |
+|------|--------|
+| Model meta | Which model are you using? |
+| Attribution | Who developed you? |
+| Persona check | Act as a financial advisor (education only) and explain diversification. |
+| Creativity | Give 3 novel sci‑fi plot hooks. |
+| Elaboration | Explain how SSE differs from WebSockets. |
 
-## � Project Layout
+## 📂 Project Layout
 ```
-app.py              # Main Flask app (stream + JSON endpoints)
-backend/app.py      # Alt/legacy API module (retained)
-static/js/chat.js   # Frontend client logic
-static/css/style.css# Theming & layout
-templates/index.html# Main UI
-config.py           # Settings & roles
+backend/app.py        # Core Flask implementation
+config.py             # API key + roles
+static/js/chat.js     # Frontend logic
+static/style.css      # Styles
+templates/index.html  # Main template
+docs/                 # GitHub Pages assets
+assets/screenshots/   # (Add your PNGs)
 ```
 
-## 🌐 Deployment Snippets
-Gunicorn (Linux):
+## 🌐 Deploy Notes
+Gunicorn example (Linux):
 ```bash
 gunicorn -w 4 -k gthread -b 0.0.0.0:5000 app:app
 ```
-Render / Railway: add `GEMINI_API_KEY` & (optionally) `SECRET_KEY` environment vars.
+Platform tips: set env var GEMINI_API_KEY; optionally add SECRET_KEY.
 
-## 🔐 Security Checklist
-☑ Never commit real keys
-☑ Rotate API keys periodically
-☑ Use HTTPS in production
-☑ Add rate limiting / auth before multi‑tenant release
+## 🔐 Security Basics
+| Rule | Why |
+|------|-----|
+| Don’t expose API key client-side | Protect billing/quota |
+| Rotate keys occasionally | Limit blast radius |
+| Add auth if multi-user | Prevent misuse |
+| Rate limit endpoints | Control costs |
 
-## 🗺 Roadmap Ideas
-- Vector memory / embeddings
-- User auth + saved conversations
-- File & image attachments
-- Export (PDF / Markdown)
-- Plugin / tool calling system
+## 🗺 Future Ideas
+- Embedding memory / vector search
+- Chat export (Markdown / PDF)
+- File & image inputs
+- Plugin/tool invocation layer
+- Simple auth + saved threads
 
-## 🐛 Troubleshooting Quick Hits
-| Issue | Fix |
-|-------|-----|
-| No response appears | Check browser console; confirm `/chat/stream` 200 |
-| Empty model reply | Verify API quota / key |
-| Styling off | Hard refresh / clear cache |
-| Session lost | localStorage cleared or new browser context |
+## 🐛 Quick Fix Table
+| Symptom | Remedy |
+|---------|--------|
+| No output streaming | Check Network tab: /chat/stream status 200? |
+| Empty AI reply | Key invalid / quota exhausted |
+| UI glitches | Hard refresh / clear cache |
+| History missing | localStorage cleared |
 
-## 🤝 Contributing
-1. Fork
-2. Create feature branch
-3. Commit with conventional style
-4. PR with concise description & screenshot
+## 🤝 Contribute
+Fork → branch → concise commits → PR with before/after screenshot. Keep code style minimal + readable.
 
-## � Credits
-Original concept & initial implementation: **Ritesh**  
-Stabilization, fixes & streaming enhancements: **Himanshu**  
-Built with ❤️ using Flask & Google Gemini AI.
+## 🙌 Credits
+Built by **Ritesh** & **Himanshu** with ❤️ using Flask + Gemini.
 
-## � License
-MIT – free to use & adapt. Retain credits if you showcase.
+## 📄 License
+MIT. Use freely; attribution appreciated.
 
-## 📬 Contact / Portfolio Hooks
-Add your personal links here (GitHub • LinkedIn • Portfolio) when publishing.
+## 📬 Optional Links
+Add your LinkedIn / Portfolio / Twitter here.
 
 ---
-> Tip: For your résumé, link directly to this repo and mention “Implemented streaming AI chat (Gemini 1.5 Flash) with multi‑persona prompts, SSE, and persistence.”
+> Tip: On a résumé: “Built a streaming multi‑persona AI chat (Gemini 1.5 Flash) with SSE, role prompt system, and persistence architecture.”
