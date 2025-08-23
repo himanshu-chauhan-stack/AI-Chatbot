@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .message { padding: 10px; margin: 10px 0; border-radius: 8px; }
+        .user { background-color: #007bff; color: white; text-align: right; }
+        .ai { background-color: #f1f1f1; }
+        button { padding: 10px 20px; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Chat Debug Test</h1>
+    <div id="messages"></div>
+    <button onclick="testChat()">Send Test Message</button>
+    <button onclick="clearMessages()">Clear Messages</button>
+    
+    <script>
+        let messageCount = 0;
+        
+        function addTestMessage(type, content) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = `<strong>${type.toUpperCase()}:</strong> ${content}`;
+            messagesDiv.appendChild(messageDiv);
+        }
+        
+        async function testChat() {
+            addTestMessage('user', 'Hello, testing the chat...');
+            
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: `Test message ${++messageCount}`,
+                        ai_role: 'helpful_assistant'
+                    })
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Response data:', data);
+                    addTestMessage('ai', data.response || 'No response content');
+                } else {
+                    const error = await response.text();
+                    addTestMessage('ai', `Error: ${response.status} - ${error}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                addTestMessage('ai', `Network Error: ${error.message}`);
+            }
+        }
+        
+        function clearMessages() {
+            document.getElementById('messages').innerHTML = '';
+            messageCount = 0;
+        }
+    </script>
+</body>
+</html>

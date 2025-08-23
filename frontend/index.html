@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ritesh A.I.</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="main">
+  <div class="first">  
+  <h1> Ritesh Assistant</h1>
+  <button id="micBtn">🎙 Speak</button>
+  <input type="text" id="query" placeholder="Type or Speak here">
+  <button id="sendBtn">Ask Ritesh A.I.</button>
+
+  <h3>Response:</h3>
+  </div>
+  <div id="response">
+    <textarea name="" id="" cols="200" rows="10">
+
+    </textarea>
+  </div>
+  <div style="margin-top:10px;text-align:center;font-size:12px;color:#666;font-family:Arial,Helvetica,sans-serif;">Made with <span style="display:inline-block;animation:pulse 1.6s infinite;">❤️</span> by <strong>Ritesh</strong> &amp; <strong>Himanshu</strong></div>
+  </div>
+
+  <script>
+  let recognition;
+  if ('webkitSpeechRecognition' in window) {
+    recognition = new webkitSpeechRecognition();
+    recognition.lang = "en-IN";
+    recognition.onresult = (event) => {
+      document.getElementById("query").value = event.results[0][0].transcript;
+    };
+    document.getElementById("micBtn").onclick = () => recognition.start();
+  } else {
+    alert("Speech Recognition not supported in this browser. Please use Chrome.");
+  }
+
+  // 📤 Send query to backend
+  document.getElementById("sendBtn").addEventListener("click", async () => {
+    let query = document.getElementById("query").value;
+
+    try {
+      let res = await fetch("http://127.0.0.1:5000/ask", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({query})
+      });
+
+      let data = await res.json();
+      document.getElementById("response").innerText = data.answer;
+
+      
+      if (data.open_url) {
+        window.open(data.open_url, "_blank");
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      alert("Backend se connect nahi ho paaya. Pehle Flask server chalao.");
+    }
+  });
+</script>
+<style>@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}</style>
+</body>
+</html>

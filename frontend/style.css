@@ -1,0 +1,83 @@
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;     
+  background: linear-gradient(135deg, #6a11cb, #2575fc); 
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: white;
+}
+
+.main {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0px 8px 20px rgba(6, 128, 79, 0.3);
+  text-align: center;
+  width: 70%;
+}
+
+h1 {
+  margin-bottom: 20px;
+  font-size: 2.5rem;
+  color: #fff;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+  text-decoration: underline;
+}
+
+#query {
+  width: 60%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  margin: 10px;
+  font-size: 1rem;
+  outline: none;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+}
+
+button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 30px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin: 10px;
+  font-weight: bold;
+  transition: all 0.3s ease-in-out;
+}
+
+#micBtn {
+  background: #ff416c;
+  color: white;
+}
+#micBtn:hover {
+  background: #ff4b2b;
+  transform: scale(1.05);
+}
+
+#sendBtn {
+  background: #00c6ff;
+  color: white;
+}
+#sendBtn:hover {
+  background: #0072ff;
+  transform: scale(1.05);
+}
+
+#response textarea {
+  width: 100%;
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 15px;
+  border: none;
+  font-size: 1rem;
+  box-shadow: inset 0px 4px 8px rgba(0,0,0,0.2);
+  resize: none;
+}
+h3{
+  font-size:1rem;
+}

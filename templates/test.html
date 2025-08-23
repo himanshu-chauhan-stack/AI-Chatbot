@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>Chat API Test</h1>
+    <button onclick="testAPI()">Test API</button>
+    <div id="result"></div>
+    
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'Hello, can you hear me?',
+                        ai_role: 'helpful_assistant'
+                    })
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Response data:', data);
+                    resultDiv.innerHTML = `<h3>Success!</h3><p><strong>AI Response:</strong> ${data.response}</p>`;
+                } else {
+                    const error = await response.text();
+                    resultDiv.innerHTML = `<h3>Error!</h3><p>Status: ${response.status}</p><p>Error: ${error}</p>`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = `<h3>Network Error!</h3><p>${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
