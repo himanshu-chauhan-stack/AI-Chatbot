@@ -383,6 +383,46 @@
           color: #fff;
           text-decoration: underline;
         }
+
+        /* API key bar */
+        .apikey-bar {
+          background: var(--bg-tertiary);
+          border-bottom: 1px solid var(--border-color);
+          padding: 6px 10px;
+          display: flex;
+          gap: 8px;
+          align-items: center;
+          flex-wrap: wrap;
+          font-size: 12px;
+        }
+        .apikey-bar strong { color: var(--accent-color); }
+        .apikey-bar input[type="password"], .apikey-bar input[type="text"] {
+          flex: 1;
+          min-width: 160px;
+          padding: 6px 8px;
+          border: 1px solid var(--border-color);
+          border-radius: 6px;
+          background: var(--bg-secondary);
+          color: var(--text-primary);
+          font-size: 12px;
+        }
+        .apikey-bar button.small-btn {
+          background: var(--accent-color);
+          border: none;
+          color: #fff;
+          padding: 6px 10px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 12px;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .apikey-bar button.small-btn.secondary { background: #4a5568; }
+        .apikey-bar .status { font-weight: 600; }
+        .apikey-bar .warn { color: var(--warning-color); font-weight: 600; }
+        .apikey-bar .err { color: var(--error-color); font-weight: 600; }
+        .apikey-bar .ok { color: var(--success-color); font-weight: 600; }
         
         @media (max-width: 768px) {
           .chat-messages {
@@ -447,6 +487,15 @@
                 </div>
             </div>
         </header>
+
+        <!-- Optional API Key Bar (NOT SECURE ON PUBLIC SITE) -->
+        <div class="apikey-bar" id="apiKeyBar">
+          <span><strong>Live Mode (Optional)</strong> Paste your <code>Gemini API Key</code> to get real answers. <span class="warn">Key is stored only in memory but visible to anyone inspecting the page.</span></span>
+          <input type="password" id="apiKeyInput" placeholder="AI Studio API Key (starts with AI...)" autocomplete="off" />
+          <button class="small-btn" id="toggleKeyVisBtn" title="Show / Hide"><i class="fas fa-eye"></i></button>
+          <button class="small-btn" id="enableRealBtn"><i class="fas fa-bolt"></i> Enable</button>
+          <span id="liveStatus" class="status"></span>
+        </div>
 
         <!-- Chat Container -->
         <main class="chat-container">
@@ -517,11 +566,28 @@
                 
                 this.demoResponses = [
                     "This is a demo response! In the full version, I'd be powered by Google Gemini 1.5 Flash.",
-                    "🚀 Great question! To see real AI responses, clone the repo and run it locally with your API key.",
+                    "🚀 Great question! To see real AI responses, add your API key above (use at your own risk on public pages).",
                     "✨ I appreciate your interest! This static demo shows the UI design and features.",
-                    "🎯 For the complete experience with streaming responses, follow the setup instructions in the README.",
-                    "💡 This interface supports multiple AI personas, real-time streaming, and more when fully deployed!"
+                    "🎯 For the complete experience with secure backend & streaming, run it locally.",
+                    "💡 This interface supports multiple AI personas, real-time streaming (when backend present), and more!"
                 ];
+
+                // Live mode fields
+                this.apiKeyInput = document.getElementById('apiKeyInput');
+                this.enableRealBtn = document.getElementById('enableRealBtn');
+                this.liveStatus = document.getElementById('liveStatus');
+                this.toggleKeyVisBtn = document.getElementById('toggleKeyVisBtn');
+                this.apiKey = null; // never persist
+                this.demoMode = true;
+
+                // Simple role prompts (subset of backend)
+                this.rolePrompts = {
+                  helpful_assistant: "You are a concise, helpful AI assistant.",
+                  teacher: "You are a patient teacher. Explain clearly with structured steps.",
+                  financial_advisor: "You provide general financial education (no personalized financial advice).",
+                  creative_writer: "You craft vivid, creative and original writing pieces.",
+                  technical_expert: "You answer with technical precision and, when useful, code examples."
+                };
                 
                 this.init();
             }
@@ -550,6 +616,8 @@
                 this.clearChatBtn.addEventListener('click', () => this.clearChat());
                 this.toggleThemeBtn.addEventListener('click', () => this.toggleTheme());
                 this.aiRoleSelect.addEventListener('change', () => this.onRoleChange());
+                this.enableRealBtn.addEventListener('click', () => this.enableRealMode());
+                this.toggleKeyVisBtn.addEventListener('click', () => this.toggleKeyVisibility());
             }
             
             handleInputChange() {
@@ -578,11 +646,15 @@
                 this.messageInput.value = '';
                 this.handleInputChange();
                 
-                // Simulate AI response after delay
-                setTimeout(() => {
-                    const response = this.demoResponses[Math.floor(Math.random() * this.demoResponses.length)];
-                    this.addMessage('ai', response);
-                }, 1000 + Math.random() * 2000);
+        if (this.demoMode || !this.apiKey) {
+          // Simulate AI response after delay
+          setTimeout(() => {
+            const response = this.demoResponses[Math.floor(Math.random() * this.demoResponses.length)];
+            this.addMessage('ai', response);
+          }, 600 + Math.random() * 1200);
+        } else {
+          this.callGemini(message);
+        }
             }
             
             addMessage(role, content) {
@@ -652,7 +724,11 @@
             onRoleChange() {
                 const selectedRole = this.aiRoleSelect.value;
                 const selectedOption = this.aiRoleSelect.options[this.aiRoleSelect.selectedIndex];
-                this.addMessage('ai', `Demo: I've switched to ${selectedOption.text} mode! In the full version, I'd use specialized prompts for this role.`);
+                if (this.demoMode) {
+                  this.addMessage('ai', `Demo: Switched to ${selectedOption.text}. (Add API key to get real answers.)`);
+                } else {
+                  this.addMessage('ai', `Live mode: Using ${selectedOption.text} perspective.`);
+                }
             }
             
             scrollToBottom() {
@@ -666,6 +742,83 @@
                     hour: '2-digit', 
                     minute: '2-digit' 
                 });
+            }
+
+            enableRealMode() {
+              const key = (this.apiKeyInput.value || '').trim();
+              if (!key) {
+                this.setLiveStatus('Provide key first', 'err');
+                return;
+              }
+              if (!/^AI[a-zA-Z0-9_\-]{20,}$/.test(key)) {
+                this.setLiveStatus('Key format looks unusual', 'warn');
+              }
+              this.apiKey = key; // memory only
+              this.demoMode = false;
+              this.setLiveStatus('Live mode ON', 'ok');
+              this.addMessage('ai', 'Live mode enabled. Your key stays only in this page memory. Avoid using production keys on public sites.');
+            }
+
+            toggleKeyVisibility() {
+              if (!this.apiKeyInput) return;
+              if (this.apiKeyInput.type === 'password') {
+                this.apiKeyInput.type = 'text';
+                this.toggleKeyVisBtn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+              } else {
+                this.apiKeyInput.type = 'password';
+                this.toggleKeyVisBtn.innerHTML = '<i class="fas fa-eye"></i>';
+              }
+            }
+
+            setLiveStatus(msg, cls) {
+              this.liveStatus.textContent = msg;
+              this.liveStatus.className = 'status ' + (cls || '');
+            }
+
+            async callGemini(userMessage) {
+              const role = this.aiRoleSelect.value;
+              const sys = this.rolePrompts[role] || this.rolePrompts.helpful_assistant;
+              const prompt = `${sys}\n\nUser: ${userMessage}`;
+              try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(this.apiKey)}`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    contents: [{ role: 'user', parts: [{ text: prompt }]}]
+                  })
+                });
+                if (!res.ok) {
+                  const txt = await res.text();
+                  this.addMessage('ai', `Error ${res.status}: ${txt.slice(0,400)}`);
+                  if (res.status === 401 || res.status === 403) this.setLiveStatus('Auth error', 'err');
+                  return;
+                }
+                const data = await res.json();
+                const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text).join('\n') || '(No content)';
+                // Simulated streaming reveal
+                await this.typeOut(text);
+              } catch (e) {
+                this.addMessage('ai', 'Request failed: ' + e.message);
+                this.setLiveStatus('Network error', 'err');
+              }
+            }
+
+            async typeOut(fullText) {
+              const wrapper = document.createElement('div');
+              wrapper.className = 'message-wrapper ai-message';
+              wrapper.innerHTML = `\n                <div class="message-avatar"><i class="fas fa-robot"></i></div>\n                <div class="message-content">\n                  <div class="message-header">\n                    <span class="message-sender">AI Assistant</span>\n                    <span class="message-time">${this.formatTime(new Date())}</span>\n                  </div>\n                  <div class="message-text" id="streamingMsg"></div>\n                </div>`;
+              this.chatMessages.appendChild(wrapper);
+              const box = wrapper.querySelector('#streamingMsg');
+              let i = 0;
+              const speed = 18; // chars per frame approx
+              function chunk() { return fullText.slice(i, i+speed); }
+              while (i < fullText.length) {
+                box.textContent += chunk();
+                i += speed;
+                await new Promise(r => setTimeout(r, 30));
+                this.scrollToBottom();
+              }
+              this.scrollToBottom();
             }
         }
         
