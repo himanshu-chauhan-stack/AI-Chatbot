@@ -21,6 +21,12 @@ An elegant, fast, multi‑persona AI chat experience powered by **Google Gemini 
 
 ---
 
+## 📸 Screenshots
+| Main Interface (Light) | Active Chat (Light) |
+|------------------------|---------------------|
+| <img src="assets/screenshots/placeholder_main_light.png" alt="Main UI" width="420"/> | <img src="assets/screenshots/placeholder_chat_light.png" alt="Chat UI" width="420"/> |
+
+
 ## � Why This Project Exists
 I wanted a minimal, fast, open implementation of a modern AI chat—without React bloat, with real streaming, and with clean persona prompts you can actually extend. This is a foundation you can fork into your own product, portfolio piece, or internal tool.
 
