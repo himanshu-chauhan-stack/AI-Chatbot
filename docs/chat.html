@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat Assistant - Live Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Copy of main chat styles - optimized for GitHub Pages */
+        :root {
+          --bg-primary: #f7f7f8;
+          --bg-secondary: #ffffff;
+          --bg-tertiary: #f1f1f3;
+          --text-primary: #2d3748;
+          --text-secondary: #4a5568;
+          --text-muted: #718096;
+          --border-color: #e2e8f0;
+          --accent-color: #10a37f;
+          --accent-hover: #0d8c6b;
+          --user-bg: #10a37f;
+          --user-text: #ffffff;
+          --ai-bg: #f7f7f8;
+          --ai-text: #2d3748;
+          --error-color: #e53e3e;
+          --warning-color: #f6ad55;
+          --success-color: #38a169;
+          --spacing-xs: 0.25rem;
+          --spacing-sm: 0.5rem;
+          --spacing-md: 1rem;
+          --spacing-lg: 1.5rem;
+          --spacing-xl: 2rem;
+          --radius-sm: 0.375rem;
+          --radius-md: 0.5rem;
+          --radius-lg: 0.75rem;
+          --radius-xl: 1rem;
+          --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+          --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        [data-theme="dark"] {
+          --bg-primary: #1a1a1a;
+          --bg-secondary: #2d2d2d;
+          --bg-tertiary: #3a3a3a;
+          --text-primary: #ffffff;
+          --text-secondary: #e2e8f0;
+          --text-muted: #a0aec0;
+          --border-color: #4a5568;
+          --ai-bg: #2d2d2d;
+          --ai-text: #ffffff;
+        }
+        
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        
+        body {
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+          background-color: var(--bg-primary);
+          color: var(--text-primary);
+          line-height: 1.6;
+          overflow: hidden;
+        }
+        
+        .app-container {
+          display: flex;
+          flex-direction: column;
+          height: 100vh;
+          max-width: 100vw;
+        }
+        
+        .chat-header {
+          background-color: var(--bg-secondary);
+          border-bottom: 1px solid var(--border-color);
+          padding: var(--spacing-md);
+          flex-shrink: 0;
+        }
+        
+        .header-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+        
+        .header-left {
+          display: flex;
+          align-items: center;
+          gap: var(--spacing-lg);
+        }
+        
+        .app-title {
+          display: flex;
+          align-items: center;
+          gap: var(--spacing-sm);
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: var(--text-primary);
+        }
+        
+        .app-title i {
+          color: var(--accent-color);
+        }
+        
+        .ai-role-selector {
+          position: relative;
+        }
+        
+        .role-select {
+          padding: var(--spacing-sm) var(--spacing-md);
+          border: 1px solid var(--border-color);
+          border-radius: var(--radius-md);
+          background-color: var(--bg-secondary);
+          color: var(--text-primary);
+          font-size: 0.875rem;
+          cursor: pointer;
+          transition: border-color 0.2s ease;
+        }
+        
+        .role-select:focus {
+          outline: none;
+          border-color: var(--accent-color);
+        }
+        
+        .header-right {
+          display: flex;
+          gap: var(--spacing-sm);
+        }
+        
+        .btn {
+          padding: var(--spacing-sm) var(--spacing-md);
+          border: none;
+          border-radius: var(--radius-md);
+          font-size: 0.875rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: inline-flex;
+          align-items: center;
+          gap: var(--spacing-sm);
+        }
+        
+        .btn-outline {
+          background-color: transparent;
+          color: var(--text-secondary);
+          border: 1px solid var(--border-color);
+        }
+        
+        .btn-outline:hover {
+          background-color: var(--bg-tertiary);
+        }
+        
+        .chat-container {
+          flex: 1;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+        }
+        
+        .chat-messages {
+          flex: 1;
+          overflow-y: auto;
+          padding: var(--spacing-lg);
+          max-width: 1200px;
+          margin: 0 auto;
+          width: 100%;
+        }
+        
+        .chat-messages::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-track {
+          background: var(--bg-tertiary);
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb {
+          background: var(--border-color);
+          border-radius: 3px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+          background: var(--text-muted);
+        }
+        
+        .message-wrapper {
+          display: flex;
+          margin-bottom: var(--spacing-lg);
+          align-items: flex-start;
+          gap: var(--spacing-md);
+        }
+        
+        .message-wrapper.user-message {
+          flex-direction: row-reverse;
+        }
+        
+        .message-avatar {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.875rem;
+          flex-shrink: 0;
+        }
+        
+        .ai-message .message-avatar {
+          background-color: var(--accent-color);
+          color: white;
+        }
+        
+        .user-message .message-avatar {
+          background-color: var(--user-bg);
+          color: var(--user-text);
+        }
+        
+        .message-content {
+          max-width: 70%;
+          min-width: 0;
+        }
+        
+        .user-message .message-content {
+          text-align: right;
+        }
+        
+        .message-header {
+          display: flex;
+          align-items: center;
+          gap: var(--spacing-sm);
+          margin-bottom: var(--spacing-xs);
+        }
+        
+        .user-message .message-header {
+          justify-content: flex-end;
+        }
+        
+        .message-sender {
+          font-weight: 600;
+          font-size: 0.875rem;
+          color: var(--text-secondary);
+        }
+        
+        .message-time {
+          font-size: 0.75rem;
+          color: var(--text-muted);
+        }
+        
+        .message-text {
+          background-color: var(--bg-secondary);
+          padding: var(--spacing-md);
+          border-radius: var(--radius-lg);
+          border: 1px solid var(--border-color);
+          font-size: 0.875rem;
+          line-height: 1.5;
+        }
+        
+        .user-message .message-text {
+          background-color: var(--user-bg);
+          color: var(--user-text);
+          border-color: var(--user-bg);
+        }
+        
+        .ai-message .message-text {
+          background-color: var(--ai-bg);
+          color: var(--ai-text);
+        }
+        
+        .chat-input-container {
+          background-color: var(--bg-secondary);
+          border-top: 1px solid var(--border-color);
+          padding: var(--spacing-lg);
+          flex-shrink: 0;
+        }
+        
+        .input-wrapper {
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+        
+        .input-area {
+          display: flex;
+          align-items: flex-end;
+          gap: var(--spacing-md);
+          background-color: var(--bg-secondary);
+          border: 1px solid var(--border-color);
+          border-radius: var(--radius-xl);
+          padding: var(--spacing-md);
+          transition: border-color 0.2s ease;
+        }
+        
+        .input-area:focus-within {
+          border-color: var(--accent-color);
+        }
+        
+        .message-input {
+          flex: 1;
+          border: none;
+          outline: none;
+          background: transparent;
+          color: var(--text-primary);
+          font-size: 0.875rem;
+          line-height: 1.5;
+          resize: none;
+          min-height: 24px;
+          max-height: 120px;
+          font-family: inherit;
+        }
+        
+        .message-input::placeholder {
+          color: var(--text-muted);
+        }
+        
+        .send-btn {
+          width: 36px;
+          height: 36px;
+          border: none;
+          border-radius: 50%;
+          background-color: var(--accent-color);
+          color: white;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s ease;
+          flex-shrink: 0;
+        }
+        
+        .send-btn:hover {
+          background-color: var(--accent-hover);
+          transform: scale(1.05);
+        }
+        
+        .send-btn:disabled {
+          background-color: var(--text-muted);
+          cursor: not-allowed;
+          transform: none;
+        }
+        
+        .input-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: var(--spacing-sm);
+          font-size: 0.75rem;
+          color: var(--text-muted);
+        }
+        
+        .credits {
+          margin-top: var(--spacing-sm);
+          text-align: center;
+          font-size: 0.7rem;
+          color: var(--text-muted);
+          user-select: none;
+          letter-spacing: 0.5px;
+        }
+        
+        .credits .heart {
+          display: inline-block;
+          animation: pulse 1.6s infinite;
+        }
+        
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.2); }
+        }
+        
+        .demo-notice {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 10px;
+          text-align: center;
+          font-size: 0.9rem;
+        }
+        
+        .demo-notice a {
+          color: #fff;
+          text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+          .chat-messages {
+            padding: var(--spacing-md);
+          }
+          
+          .chat-input-container {
+            padding: var(--spacing-md);
+          }
+          
+          .message-content {
+            max-width: 85%;
+          }
+          
+          .header-content {
+            flex-direction: column;
+            gap: var(--spacing-md);
+            align-items: stretch;
+          }
+          
+          .header-left {
+            justify-content: space-between;
+          }
+          
+          .header-right {
+            justify-content: center;
+          }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-notice">
+        🚀 This is a static demo. For full functionality, <a href="https://github.com/himanshu-chauhan-stack/AI-Chatbot">clone the repo</a> and run locally with your Gemini API key.
+    </div>
+    
+    <div class="app-container">
+        <!-- Header -->
+        <header class="chat-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1 class="app-title">
+                        <i class="fas fa-robot"></i>
+                        AI Chat Assistant
+                    </h1>
+                    <div class="ai-role-selector">
+                        <select id="aiRoleSelect" class="role-select">
+                            <option value="helpful_assistant">Helpful Assistant</option>
+                            <option value="teacher">Teacher</option>
+                            <option value="financial_advisor">Financial Advisor</option>
+                            <option value="creative_writer">Creative Writer</option>
+                            <option value="technical_expert">Technical Expert</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button id="clearChatBtn" class="btn btn-outline" title="Clear Chat">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button id="toggleThemeBtn" class="btn btn-outline" title="Toggle Theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Chat Container -->
+        <main class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <!-- Welcome message -->
+                <div class="message-wrapper ai-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">AI Assistant</span>
+                            <span class="message-time" id="welcomeTime"></span>
+                        </div>
+                        <div class="message-text">
+                            <p>Hello! This is a static demo of the AI Chat Assistant.</p>
+                            <p>🔧 To use the full chat functionality with Gemini AI:</p>
+                            <p>1. Clone the repository from GitHub</p>
+                            <p>2. Set up your Google Gemini API key</p>
+                            <p>3. Run <code>python app.py</code> locally</p>
+                            <p>Try typing a message below to see the UI in action!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Input Area -->
+        <footer class="chat-input-container">
+            <div class="input-wrapper">
+                <div class="input-area">
+                    <textarea 
+                        id="messageInput" 
+                        class="message-input" 
+                        placeholder="Type your message here (demo mode - responses are simulated)..." 
+                        rows="1"
+                        maxlength="2000"
+                    ></textarea>
+                    <button id="sendBtn" class="send-btn" title="Send Message">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="input-footer">
+                    <span class="character-count">
+                        <span id="charCount">0</span>/2000
+                    </span>
+                    <span class="input-hint">
+                        Press Enter to send (demo responses only)
+                    </span>
+                </div>
+                <div class="credits">Made with <span class="heart">❤️</span> by <strong>Ritesh</strong> &amp; <strong>Himanshu</strong></div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Static demo functionality
+        class DemoChatApp {
+            constructor() {
+                this.messageInput = document.getElementById('messageInput');
+                this.sendBtn = document.getElementById('sendBtn');
+                this.chatMessages = document.getElementById('chatMessages');
+                this.clearChatBtn = document.getElementById('clearChatBtn');
+                this.toggleThemeBtn = document.getElementById('toggleThemeBtn');
+                this.aiRoleSelect = document.getElementById('aiRoleSelect');
+                this.charCount = document.getElementById('charCount');
+                this.currentTheme = localStorage.getItem('theme') || 'light';
+                
+                this.demoResponses = [
+                    "This is a demo response! In the full version, I'd be powered by Google Gemini 1.5 Flash.",
+                    "🚀 Great question! To see real AI responses, clone the repo and run it locally with your API key.",
+                    "✨ I appreciate your interest! This static demo shows the UI design and features.",
+                    "🎯 For the complete experience with streaming responses, follow the setup instructions in the README.",
+                    "💡 This interface supports multiple AI personas, real-time streaming, and more when fully deployed!"
+                ];
+                
+                this.init();
+            }
+            
+            init() {
+                this.initTheme();
+                this.initEventListeners();
+                this.updateCharacterCount();
+                document.getElementById('welcomeTime').textContent = this.formatTime(new Date());
+            }
+            
+            initTheme() {
+                document.documentElement.setAttribute('data-theme', this.currentTheme);
+                this.updateThemeIcon();
+            }
+            
+            initEventListeners() {
+                this.sendBtn.addEventListener('click', () => this.sendMessage());
+                this.messageInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
+                this.messageInput.addEventListener('input', () => this.handleInputChange());
+                this.clearChatBtn.addEventListener('click', () => this.clearChat());
+                this.toggleThemeBtn.addEventListener('click', () => this.toggleTheme());
+                this.aiRoleSelect.addEventListener('change', () => this.onRoleChange());
+            }
+            
+            handleInputChange() {
+                this.updateCharacterCount();
+                this.updateSendButton();
+            }
+            
+            updateCharacterCount() {
+                const count = this.messageInput.value.length;
+                this.charCount.textContent = count;
+            }
+            
+            updateSendButton() {
+                const hasText = this.messageInput.value.trim().length > 0;
+                this.sendBtn.disabled = !hasText;
+            }
+            
+            sendMessage() {
+                const message = this.messageInput.value.trim();
+                if (!message) return;
+                
+                // Add user message
+                this.addMessage('user', message);
+                
+                // Clear input
+                this.messageInput.value = '';
+                this.handleInputChange();
+                
+                // Simulate AI response after delay
+                setTimeout(() => {
+                    const response = this.demoResponses[Math.floor(Math.random() * this.demoResponses.length)];
+                    this.addMessage('ai', response);
+                }, 1000 + Math.random() * 2000);
+            }
+            
+            addMessage(role, content) {
+                const messageWrapper = document.createElement('div');
+                messageWrapper.className = `message-wrapper ${role}-message`;
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'message-avatar';
+                avatar.innerHTML = role === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+                
+                const messageContent = document.createElement('div');
+                messageContent.className = 'message-content';
+                
+                const messageHeader = document.createElement('div');
+                messageHeader.className = 'message-header';
+                
+                const messageSender = document.createElement('span');
+                messageSender.className = 'message-sender';
+                messageSender.textContent = role === 'user' ? 'You' : 'AI Assistant (Demo)';
+                
+                const messageTime = document.createElement('span');
+                messageTime.className = 'message-time';
+                messageTime.textContent = this.formatTime(new Date());
+                
+                const messageText = document.createElement('div');
+                messageText.className = 'message-text';
+                messageText.textContent = content;
+                
+                messageHeader.appendChild(messageSender);
+                messageHeader.appendChild(messageTime);
+                
+                messageContent.appendChild(messageHeader);
+                messageContent.appendChild(messageText);
+                
+                messageWrapper.appendChild(avatar);
+                messageWrapper.appendChild(messageContent);
+                
+                this.chatMessages.appendChild(messageWrapper);
+                this.scrollToBottom();
+            }
+            
+            clearChat() {
+                const messages = this.chatMessages.querySelectorAll('.message-wrapper');
+                messages.forEach((msg, index) => {
+                    if (index > 0) { // Keep welcome message
+                        msg.remove();
+                    }
+                });
+            }
+            
+            toggleTheme() {
+                this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', this.currentTheme);
+                localStorage.setItem('theme', this.currentTheme);
+                this.updateThemeIcon();
+            }
+            
+            updateThemeIcon() {
+                const icon = this.toggleThemeBtn.querySelector('i');
+                if (this.currentTheme === 'dark') {
+                    icon.className = 'fas fa-sun';
+                } else {
+                    icon.className = 'fas fa-moon';
+                }
+            }
+            
+            onRoleChange() {
+                const selectedRole = this.aiRoleSelect.value;
+                const selectedOption = this.aiRoleSelect.options[this.aiRoleSelect.selectedIndex];
+                this.addMessage('ai', `Demo: I've switched to ${selectedOption.text} mode! In the full version, I'd use specialized prompts for this role.`);
+            }
+            
+            scrollToBottom() {
+                setTimeout(() => {
+                    this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+                }, 100);
+            }
+            
+            formatTime(date) {
+                return date.toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+            }
+        }
+        
+        // Initialize demo app
+        document.addEventListener('DOMContentLoaded', function() {
+            new DemoChatApp();
+        });
+    </script>
+</body>
+</html>
